@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#111111">
+<link rel="manifest" href="manifest.json">
+<title>Delivery | Drogaria Rocha</title>
+<style>
+:root{
+  --laranja:#ff6a00;
+  --preto:#111;
+  --cinza:#f2f2f2;
+  --borda:#ddd;
+  --ok:#0a8f3c;
+  --danger:#b00020;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--cinza)}
+header{background:var(--preto);color:#fff;padding:14px 16px}
+header h3{margin:0;font-size:18px}
+header span{color:var(--laranja)}
+.container{padding:12px;max-width:1100px;margin:auto}
+.card{
+  background:#fff;border-radius:12px;padding:14px;margin-bottom:12px;
+  box-shadow:0 2px 10px rgba(0,0,0,.08)
+}
+.card h3{margin:0 0 10px;border-left:4px solid var(--laranja);padding-left:10px}
+label{font-size:12px;font-weight:800;color:#555}
+input,select{
+  width:100%;padding:10px;margin:6px 0 10px;
+  border:1px solid var(--borda);border-radius:8px;font-size:14px
+}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:640px){.row2{grid-template-columns:1fr}}
+button{
+  border:none;border-radius:8px;padding:10px 12px;font-weight:900;cursor:pointer
+}
+.btn-main{background:var(--laranja);color:#fff;width:100%}
+.btn-dark{background:var(--preto);color:#fff}
+.btn-ok{background:var(--ok);color:#fff}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-small{font-size:12px;margin:2px;padding:8px 10px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:720px}
+th{background:var(--preto);color:#fff;padding:10px;font-size:12px;text-align:left}
+td{padding:10px;border-bottom:1px solid var(--borda);font-size:12px;vertical-align:top}
+td.actions{white-space:nowrap}
+.badge{padding:4px 8px;border-radius:999px;font-size:11px;font-weight:900}
+.Aguardando{background:#eee}
+.Em\ rota{background:#ffe0c2;color:#b34700}
+.Entregue{background:#d4f7d4;color:#006400}
+.Cancelado{background:#ffd6d6;color:#8b0000}
+.notice{background:#fff7ed;border:1px solid #ffd7b8;color:#7a3a00;padding:10px;border-radius:10px;font-size:12px}
+.muted{font-size:12px;color:#666}
+</style>
+</head>
+<body>
+
+<header>
+  <h3>Delivery — <span>Drogaria Rocha</span></h3>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h3>Cadastro de Clientes</h3>
+
+    <div class="row2">
+      <div>
+        <label>Nome</label>
+        <input id="cNome" placeholder="Ex.: Maria">
+      </div>
+      <div>
+        <label>Telefone (somente números)</label>
+        <input id="cTel" placeholder="Ex.: 89999999999">
+      </div>
+    </div>
+
+    <div class="row2">
+      <button class="btn-dark" onclick="salvarCliente()">Salvar / Atualizar</button>
+      <button class="btn-danger" onclick="excluirCliente()">Excluir</button>
+    </div>
+
+    <div style="margin-top:10px">
+      <label>Clientes salvos</label>
+      <select id="clientesSelect" onchange="usarClienteSelecionado()">
+        <option value="">Selecione um cliente…</option>
+      </select>
+    </div>
+
+    <div class="notice" style="margin-top:10px">
+      No Xiaomi, para abrir sempre no WhatsApp Business, defina o Business como padrão para links do WhatsApp nas configurações do sistema.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Novo Pedido</h3>
+
+    <label>Data</label>
+    <input type="date" id="dataPedido">
+
+    <label>Cliente</label>
+    <input id="cliente" placeholder="Nome do cliente">
+
+    <label>Telefone (somente números)</label>
+    <input id="telefone" placeholder="89999999999" oninput="autoBuscarClientePorTelefone()">
+
+    <label>Pedido</label>
+    <input id="pedido" placeholder="Ex.: Dipirona + Vitamina C">
+
+    <label>Valor (R$)</label>
+    <input id="valor" placeholder="Ex.: 35,90">
+
+    <button class="btn-main" onclick="addPedido()">Adicionar Pedido</button>
+    <div class="muted" style="margin-top:8px">Dica: ao adicionar pedido com cliente + telefone, o cliente aparece no cadastro (se ainda não existir).</div>
+  </div>
+
+  <div class="card">
+    <h3>Pedidos de Hoje</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Pedido</th>
+            <th>Valor</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="lista"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row2">
+      <button class="btn-ok" onclick="abrirDia()">Abrir Dia</button>
+      <button class="btn-danger" onclick="fecharDia()">Fechar Dia</button>
+    </div>
+    <div class="muted" style="margin-top:8px">Fechar dia arquiva os pedidos de hoje e baixa um TXT com o fechamento.</div>
+  </div>
+
+  <div class="card">
+    <h3>Relatórios</h3>
+    <div class="row2">
+      <div>
+        <label>Início</label>
+        <input type="date" id="repIni">
+      </div>
+      <div>
+        <label>Fim</label>
+        <input type="date" id="repFim">
+      </div>
+    </div>
+    <button class="btn-dark" onclick="relatorioPeriodo()">Baixar relatório por período</button>
+  </div>
+
+</div>
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./service-worker.js");
+}
+
+const STORAGE_ORDERS = "rocha_orders_v3";
+const STORAGE_CLIENTS = "rocha_clients_v3";
+const STORAGE_DAY = "rocha_day_v3";
+
+let orders = JSON.parse(localStorage.getItem(STORAGE_ORDERS) || "[]");
+let clients = JSON.parse(localStorage.getItem(STORAGE_CLIENTS) || "[]");
+let dayStatus = JSON.parse(localStorage.getItem(STORAGE_DAY) || "{}");
+
+function hoje(){ return new Date().toISOString().split("T")[0]; }
+function digits(v){ return String(v||"").replace(/\D/g,""); }
+function parseMoney(s){
+  const n = Number(String(s||"").trim().replace(/\./g,"").replace(",","."));
+  return Number.isFinite(n) ? n : NaN;
+}
+function fmtMoney(n){ return (Number(n)||0).toFixed(2).replace(".",","); }
+
+function saveAll(){
+  localStorage.setItem(STORAGE_ORDERS, JSON.stringify(orders));
+  localStorage.setItem(STORAGE_CLIENTS, JSON.stringify(clients));
+  localStorage.setItem(STORAGE_DAY, JSON.stringify(dayStatus));
+}
+
+function isClosed(){
+  const d = hoje();
+  return (dayStatus[d] || "aberto") === "fechado";
+}
+
+(function init(){
+  const d = hoje();
+  dataPedido.value = d;
+  repIni.value = d;
+  repFim.value = d;
+  if(!dayStatus[d]) dayStatus[d] = "aberto";
+  saveAll();
+  renderClients();
+  renderOrders();
+})();
+
+function renderClients(){
+  const sel = document.getElementById("clientesSelect");
+  sel.innerHTML = '<option value="">Selecione um cliente…</option>';
+  const sorted = [...clients].sort((a,b)=> (a.nome||"").localeCompare(b.nome||""));
+  sorted.forEach(c=>{
+    const opt = document.createElement("option");
+    opt.value = c.tel;
+    opt.textContent = `${c.nome} — ${c.tel}`;
+    sel.appendChild(opt);
+  });
+}
+
+function salvarCliente(){
+  const nome = (cNome.value || "").trim();
+  const tel = digits(cTel.value);
+
+  if(!nome || !tel){
+    alert("Preencha Nome e Telefone.");
+    return;
+  }
+  const idx = clients.findIndex(c => c.tel === tel);
+  if(idx >= 0) clients[idx].nome = nome;
+  else clients.push({nome, tel});
+
+  cNome.value = ""; cTel.value = "";
+  saveAll();
+  renderClients();
+  alert("Cliente salvo!");
+}
+
+function excluirCliente(){
+  const tel = digits(cTel.value) || (clientesSelect.value || "");
+  if(!tel){ alert("Selecione um cliente ou informe o telefone."); return; }
+
+  const c = clients.find(x => x.tel === tel);
+  if(!c){ alert("Cliente não encontrado."); return; }
+  if(!confirm(`Excluir ${c.nome} (${c.tel})?`)) return;
+
+  clients = clients.filter(x => x.tel !== tel);
+  cNome.value = ""; cTel.value = "";
+  clientesSelect.value = "";
+  saveAll();
+  renderClients();
+  alert("Cliente excluído!");
+}
+
+function usarClienteSelecionado(){
+  const tel = clientesSelect.value;
+  if(!tel) return;
+  const c = clients.find(x => x.tel === tel);
+  if(!c) return;
+
+  cliente.value = c.nome;
+  telefone.value = c.tel;
+
+  cNome.value = c.nome;
+  cTel.value = c.tel;
+}
+
+function autoBuscarClientePorTelefone(){
+  const tel = digits(telefone.value);
+  telefone.value = tel;
+  const c = clients.find(x => x.tel === tel);
+  if(c) cliente.value = c.nome;
+}
+
+function addPedido(){
+  if(isClosed()){
+    alert("Dia fechado. Clique em 'Abrir Dia' para lançar pedidos.");
+    return;
+  }
+
+  const date = dataPedido.value || hoje();
+  const nome = (cliente.value || "").trim();
+  const tel = digits(telefone.value);
+  const desc = (pedido.value || "").trim();
+  const val = parseMoney(valor.value);
+
+  if(!nome || !tel || !desc || !Number.isFinite(val)){
+    alert("Preencha Cliente, Telefone, Pedido e Valor corretamente.");
+    return;
+  }
+
+  if(!clients.some(c => c.tel === tel)){
+    clients.push({nome, tel});
+    saveAll();
+    renderClients();
+  }
+
+  orders.push({
+    id: "id_" + Math.random().toString(16).slice(2) + "_" + Date.now(),
+    date, nome, tel, desc, val,
+    status: "Aguardando",
+    archived: false
+  });
+
+  pedido.value=""; valor.value="";
+  saveAll();
+  renderOrders();
+}
+
+function ordersToday(){
+  const d = hoje();
+  return orders.filter(o => o.date === d && !o.archived);
+}
+
+function setStatus(i, status){
+  if(isClosed()){
+    alert("Dia fechado. Não é possível alterar.");
+    return;
+  }
+  const list = ordersToday();
+  const target = list[i];
+  if(!target) return;
+
+  orders = orders.map(o => o.id === target.id ? {...o, status} : o);
+  saveAll();
+  renderOrders();
+}
+
+function excluirPedido(i){
+  if(isClosed()){
+    alert("Dia fechado. Não é possível excluir.");
+    return;
+  }
+  const list = ordersToday();
+  const target = list[i];
+  if(!target) return;
+
+  if(!confirm("Excluir este pedido definitivamente?")) return;
+  orders = orders.filter(o => o.id !== target.id);
+  saveAll();
+  renderOrders();
+}
+
+function abrirDia(){
+  dayStatus[hoje()] = "aberto";
+  saveAll();
+  alert("Dia aberto.");
+}
+
+function fecharDia(){
+  if(isClosed()){
+    alert("O dia já está fechado.");
+    return;
+  }
+  const list = ordersToday();
+  if(list.length === 0){
+    alert("Nenhum pedido hoje.");
+    return;
+  }
+  const d = hoje();
+  orders = orders.map(o => (o.date === d && !o.archived) ? {...o, archived:true} : o);
+
+  let total = 0;
+  let txt = `FECHAMENTO DO DIA - DROGARIA ROCHA\nData: ${d}\n\n`;
+  list.forEach(o=>{
+    total += o.val;
+    txt += `${o.nome} | ${o.desc} | R$ ${fmtMoney(o.val)} | ${o.status}\n`;
+  });
+  txt += `\nTOTAL: R$ ${fmtMoney(total)}\n`;
+
+  const blob = new Blob([txt], {type:"text/plain;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `fechamento_${d}.txt`;
+  a.click();
+
+  dayStatus[d] = "fechado";
+  saveAll();
+  renderOrders();
+  alert("Dia fechado e fechamento baixado.");
+}
+
+function relatorioPeriodo(){
+  const ini = repIni.value;
+  const fim = repFim.value;
+  if(!ini || !fim || ini > fim){
+    alert("Período inválido.");
+    return;
+  }
+  const list = orders.filter(o => o.date >= ini && o.date <= fim);
+  if(list.length === 0){
+    alert("Nenhum pedido no período.");
+    return;
+  }
+  let total = 0;
+  let txt = `RELATÓRIO - DROGARIA ROCHA\nPeríodo: ${ini} a ${fim}\n\n`;
+  list.forEach(o=>{
+    total += o.val;
+    txt += `${o.date} | ${o.nome} | ${o.desc} | R$ ${fmtMoney(o.val)} | ${o.status} | ${o.archived ? "FECHADO" : "ABERTO"}\n`;
+  });
+  txt += `\nTOTAL: R$ ${fmtMoney(total)}\n`;
+
+  const blob = new Blob([txt], {type:"text/plain;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `relatorio_${ini}_a_${fim}.txt`;
+  a.click();
+}
+
+function renderOrders(){
+  const list = ordersToday();
+  const tbody = document.getElementById("lista");
+  tbody.innerHTML = "";
+
+  list.forEach((o,i)=>{
+    tbody.innerHTML += `
+      <tr>
+        <td><b>${o.nome}</b><div class="muted">${o.tel}</div></td>
+        <td>${o.desc}</td>
+        <td>R$ ${fmtMoney(o.val)}</td>
+        <td><span class="badge ${o.status}">${o.status}</span></td>
+        <td class="actions">
+          <button class="btn-small btn-dark" onclick="setStatus(${i},'Em rota')">Rota</button>
+          <button class="btn-small btn-dark" onclick="setStatus(${i},'Entregue')">Entregue</button>
+          <button class="btn-small btn-dark" onclick="setStatus(${i},'Cancelado')">Cancelar</button>
+          <button class="btn-small btn-danger" onclick="excluirPedido(${i})">Excluir</button>
+        </td>
+      </tr>`;
+  });
+}
+</script>
+
+</body>
+</html>
