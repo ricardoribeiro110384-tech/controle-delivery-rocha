@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#111111">
-<link rel="manifest" href="manifest.json">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#111111" />
+<link rel="manifest" href="manifest.json" />
 <title>Controle de Delivery | Drogaria Rocha</title>
+
 <style>
 :root{
   --laranja:#ff6a00;
@@ -21,6 +22,7 @@ header{background:var(--preto);color:#fff;padding:14px 16px;position:sticky;top:
 header h3{margin:0;font-size:18px}
 header span{color:var(--laranja)}
 .container{padding:12px;max-width:1100px;margin:auto}
+
 .card{
   background:#fff;border-radius:12px;padding:14px;margin-bottom:12px;
   box-shadow:0 2px 10px rgba(0,0,0,.08)
@@ -29,10 +31,10 @@ header span{color:var(--laranja)}
 label{font-size:12px;font-weight:900;color:#555}
 input,select,textarea{
   width:100%;padding:10px;margin:6px 0 10px;
-  border:1px solid var(--borda);border-radius:10px;font-size:14px;
-  outline:none;
+  border:1px solid var(--borda);border-radius:10px;font-size:14px;outline:none
 }
 textarea{min-height:70px;resize:vertical}
+
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 @media(max-width:760px){.row2,.row3{grid-template-columns:1fr}}
@@ -45,19 +47,23 @@ button{
 .btn-ok{background:var(--ok);color:#fff}
 .btn-danger{background:var(--danger);color:#fff}
 .btn-small{font-size:12px;margin:2px;padding:8px 10px;border-radius:10px}
+
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;min-width:980px}
 th{background:var(--preto);color:#fff;padding:10px;font-size:12px;text-align:left}
 td{padding:10px;border-bottom:1px solid var(--borda);font-size:12px;vertical-align:top}
 td.actions{white-space:nowrap}
+
 .badge{padding:4px 10px;border-radius:999px;font-size:11px;font-weight:1000;display:inline-block}
 .Aguardando{background:#eee}
 .Separando{background:#dbeafe;color:#1e3a8a}
 .Em\ rota{background:#ffe0c2;color:#b34700}
 .Entregue{background:#d4f7d4;color:#006400}
 .Cancelado{background:#ffd6d6;color:#8b0000}
+
 .notice{background:#fff7ed;border:1px solid #ffd7b8;color:#7a3a00;padding:10px;border-radius:12px;font-size:12px}
 .muted{font-size:12px;color:#666}
+
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 @media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
 .kpi{background:#111;color:#fff;border-radius:14px;padding:12px}
@@ -66,8 +72,8 @@ td.actions{white-space:nowrap}
 .kpi.orange{background:var(--laranja)}
 </style>
 </head>
-<body>
 
+<body>
 <header>
   <h3>Controle de Delivery — <span>Drogaria Rocha</span></h3>
 </header>
@@ -86,11 +92,11 @@ td.actions{white-space:nowrap}
     <div class="row2">
       <div>
         <label>Nome</label>
-        <input id="cNome" placeholder="Ex.: Maria">
+        <input id="cNome" placeholder="Ex.: Maria" />
       </div>
       <div>
         <label>Telefone (somente números)</label>
-        <input id="cTel" placeholder="Ex.: 89999999999">
+        <input id="cTel" placeholder="Ex.: 89999999999" />
       </div>
     </div>
 
@@ -108,7 +114,8 @@ td.actions{white-space:nowrap}
     </div>
 
     <div class="notice" style="margin-top:10px">
-      No computador, os botões abrem o <b>WhatsApp Web</b>. Certifique-se de estar logado.
+      No computador, os botões de WhatsApp abrem o <b>WhatsApp Web</b> na mesma aba (não bloqueia pop-up).<br/>
+      Antes, abra <b>web.whatsapp.com</b> e faça login.
     </div>
   </div>
 
@@ -118,7 +125,7 @@ td.actions{white-space:nowrap}
     <div class="row2">
       <div>
         <label>Data</label>
-        <input type="date" id="dataPedido">
+        <input type="date" id="dataPedido" />
       </div>
       <div>
         <label>Status inicial</label>
@@ -131,10 +138,10 @@ td.actions{white-space:nowrap}
     </div>
 
     <label>Cliente</label>
-    <input id="cliente" placeholder="Nome do cliente">
+    <input id="cliente" placeholder="Nome do cliente" />
 
-    <label>Telefone (somente números)</label>
-    <input id="telefone" placeholder="89999999999" inputmode="numeric" oninput="autoBuscarClientePorTelefone()">
+    <label>Telefone (somente números, com DDD)</label>
+    <input id="telefone" placeholder="Ex.: 89981485863" inputmode="numeric" oninput="autoBuscarClientePorTelefone()" />
 
     <label>Pedido</label>
     <textarea id="pedido" placeholder="Ex.: Dipirona + Vitamina C"></textarea>
@@ -142,11 +149,11 @@ td.actions{white-space:nowrap}
     <div class="row2">
       <div>
         <label>Valor (R$)</label>
-        <input id="valor" placeholder="Ex.: 35,90">
+        <input id="valor" placeholder="Ex.: 35,90" />
       </div>
       <div>
         <label>Observação (opcional)</label>
-        <input id="obs" placeholder="Ex.: sem troco / entregar na portaria">
+        <input id="obs" placeholder="Ex.: sem troco / entregar na portaria" />
       </div>
     </div>
 
@@ -186,11 +193,11 @@ td.actions{white-space:nowrap}
     <div class="row2">
       <div>
         <label>Início</label>
-        <input type="date" id="repIni">
+        <input type="date" id="repIni" />
       </div>
       <div>
         <label>Fim</label>
-        <input type="date" id="repFim">
+        <input type="date" id="repFim" />
       </div>
     </div>
     <div class="row3">
@@ -198,7 +205,7 @@ td.actions{white-space:nowrap}
       <button class="btn-dark" onclick="exportarBackup()">Backup completo (.json)</button>
       <label class="btn-dark" style="display:inline-flex;align-items:center;justify-content:center;gap:8px">
         Importar backup
-        <input id="importFile" type="file" accept="application/json" style="display:none" onchange="importarBackup(event)">
+        <input id="importFile" type="file" accept="application/json" style="display:none" onchange="importarBackup(event)" />
       </label>
     </div>
   </div>
@@ -212,9 +219,9 @@ if ("serviceWorker" in navigator) {
 }
 
 /* STORAGE */
-const STORAGE_ORDERS = "rocha_orders_v5";
-const STORAGE_CLIENTS = "rocha_clients_v5";
-const STORAGE_DAY = "rocha_day_v5";
+const STORAGE_ORDERS = "rocha_orders_v6";
+const STORAGE_CLIENTS = "rocha_clients_v6";
+const STORAGE_DAY = "rocha_day_v6";
 
 let orders = JSON.parse(localStorage.getItem(STORAGE_ORDERS) || "[]");
 let clients = JSON.parse(localStorage.getItem(STORAGE_CLIENTS) || "[]");
@@ -238,9 +245,9 @@ function isClosed(){ return (dayStatus[hoje()] || "aberto") === "fechado"; }
 /* INIT */
 (function init(){
   const d = hoje();
-  dataPedido.value = d;
-  repIni.value = d;
-  repFim.value = d;
+  document.getElementById("dataPedido").value = d;
+  document.getElementById("repIni").value = d;
+  document.getElementById("repFim").value = d;
   if(!dayStatus[d]) dayStatus[d] = "aberto";
   saveAll();
   renderClients();
@@ -261,58 +268,79 @@ function renderClients(){
   });
 }
 function salvarCliente(){
-  const nome = (cNome.value || "").trim();
-  const tel = digits(cTel.value);
+  const nome = (document.getElementById("cNome").value || "").trim();
+  const tel = digits(document.getElementById("cTel").value);
   if(!nome || !tel){ alert("Preencha Nome e Telefone."); return; }
+
   const idx = clients.findIndex(c => c.tel === tel);
   if(idx >= 0) clients[idx].nome = nome;
   else clients.push({nome, tel});
-  cNome.value=""; cTel.value="";
+
+  document.getElementById("cNome").value="";
+  document.getElementById("cTel").value="";
   saveAll(); renderClients();
   alert("Cliente salvo!");
 }
 function excluirCliente(){
-  const tel = digits(cTel.value) || (clientesSelect.value || "");
+  const tel = digits(document.getElementById("cTel").value) || (document.getElementById("clientesSelect").value || "");
   if(!tel){ alert("Selecione um cliente ou informe o telefone."); return; }
+
   const c = clients.find(x => x.tel === tel);
   if(!c){ alert("Cliente não encontrado."); return; }
   if(!confirm(`Excluir ${c.nome} (${c.tel})?`)) return;
+
   clients = clients.filter(x => x.tel !== tel);
-  cNome.value=""; cTel.value=""; clientesSelect.value="";
+  document.getElementById("cNome").value="";
+  document.getElementById("cTel").value="";
+  document.getElementById("clientesSelect").value="";
   saveAll(); renderClients();
   alert("Cliente excluído!");
 }
 function usarClienteSelecionado(){
-  const tel = clientesSelect.value;
+  const tel = document.getElementById("clientesSelect").value;
   if(!tel) return;
   const c = clients.find(x => x.tel === tel);
   if(!c) return;
-  cliente.value = c.nome;
-  telefone.value = c.tel;
-  cNome.value = c.nome;
-  cTel.value = c.tel;
+
+  document.getElementById("cliente").value = c.nome;
+  document.getElementById("telefone").value = c.tel;
+  document.getElementById("cNome").value = c.nome;
+  document.getElementById("cTel").value = c.tel;
 }
 function autoBuscarClientePorTelefone(){
-  const tel = digits(telefone.value);
-  telefone.value = tel;
+  const telEl = document.getElementById("telefone");
+  const tel = digits(telEl.value);
+  telEl.value = tel;
+
   const c = clients.find(x => x.tel === tel);
-  if(c) cliente.value = c.nome;
+  if(c) document.getElementById("cliente").value = c.nome;
+}
+function exportarClientes(){
+  const blob = new Blob([JSON.stringify(clients,null,2)],{type:"application/json;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "clientes_drogaria_rocha.json";
+  a.click();
 }
 
 /* ORDERS */
+function ordersToday(){
+  const d = hoje();
+  return orders.filter(o => o.date === d && !o.archived);
+}
 function addPedido(){
   if(isClosed()){ alert("Dia fechado. Clique em 'Abrir Dia' para lançar pedidos."); return; }
 
-  const date = dataPedido.value || hoje();
-  const nome = (cliente.value || "").trim();
-  const tel = digits(telefone.value);
-  const desc = (pedido.value || "").trim();
-  const val = parseMoney(valor.value);
-  const obsTxt = (obs.value || "").trim();
-  const st = (statusInicial.value || "Aguardando");
+  const date = document.getElementById("dataPedido").value || hoje();
+  const nome = (document.getElementById("cliente").value || "").trim();
+  const tel = digits(document.getElementById("telefone").value);
+  const desc = (document.getElementById("pedido").value || "").trim();
+  const val = parseMoney(document.getElementById("valor").value);
+  const obsTxt = (document.getElementById("obs").value || "").trim();
+  const st = (document.getElementById("statusInicial").value || "Aguardando");
 
   if(!nome || !tel || !desc || !Number.isFinite(val)){
-    alert("Preencha Cliente, Telefone, Pedido e Valor corretamente.");
+    alert("Preencha Cliente, Telefone (com DDD), Pedido e Valor corretamente.");
     return;
   }
 
@@ -329,37 +357,38 @@ function addPedido(){
     archived: false
   });
 
-  pedido.value=""; valor.value=""; obs.value="";
+  document.getElementById("pedido").value="";
+  document.getElementById("valor").value="";
+  document.getElementById("obs").value="";
   saveAll();
   renderOrders();
   renderDashboard();
 }
-
-function ordersToday(){
-  const d = hoje();
-  return orders.filter(o => o.date === d && !o.archived);
-}
-
 function setStatus(i, status){
   if(isClosed()){ alert("Dia fechado. Não é possível alterar."); return; }
   const list = ordersToday();
   const target = list[i];
   if(!target) return;
-  orders = orders.map(o => o.id === target.id ? {...o, status} : o);
-  saveAll(); renderOrders(); renderDashboard();
-}
 
+  orders = orders.map(o => o.id === target.id ? {...o, status} : o);
+  saveAll();
+  renderOrders();
+  renderDashboard();
+}
 function excluirPedido(i){
   if(isClosed()){ alert("Dia fechado. Não é possível excluir."); return; }
   const list = ordersToday();
   const target = list[i];
   if(!target) return;
+
   if(!confirm("Excluir este pedido definitivamente?")) return;
   orders = orders.filter(o => o.id !== target.id);
-  saveAll(); renderOrders(); renderDashboard();
+  saveAll();
+  renderOrders();
+  renderDashboard();
 }
 
-/* WHATSAPP (PC -> Web WhatsApp) */
+/* WHATSAPP (PC SEM POP-UP) */
 function abrirWhatsApp(i, tipo){
   const list = ordersToday();
   const o = list[i];
@@ -372,20 +401,18 @@ function abrirWhatsApp(i, tipo){
     ? `Olá ${o.nome}! Seu pedido está: ${o.status}. Drogaria Rocha.`
     : `Olá ${o.nome}! Obrigado pela preferência 😊 Drogaria Rocha.`;
 
-  // Se o tel já tiver DDD (ex: 89...), isso funciona.
-  // Acrescenta 55 (Brasil). Se você já salvar com 55, tire esse "55".
+  // abre no mesmo TAB (evita bloqueio de pop-up)
   const url = `https://web.whatsapp.com/send?phone=55${tel}&text=${encodeURIComponent(msg)}`;
-  window.open(url, "_blank");
+  window.location.href = url;
 }
 
-/* DAY OPEN/CLOSE + TXT */
+/* DAY OPEN/CLOSE */
 function abrirDia(){
   dayStatus[hoje()] = "aberto";
   saveAll();
   renderDashboard();
   alert("Dia aberto.");
 }
-
 function fecharDia(){
   if(isClosed()){ alert("O dia já está fechado."); return; }
   const list = ordersToday();
@@ -417,9 +444,10 @@ function fecharDia(){
 
 /* REPORTS / BACKUP */
 function relatorioPeriodo(){
-  const ini = repIni.value;
-  const fim = repFim.value;
+  const ini = document.getElementById("repIni").value;
+  const fim = document.getElementById("repFim").value;
   if(!ini || !fim || ini > fim){ alert("Período inválido."); return; }
+
   const list = orders.filter(o => o.date >= ini && o.date <= fim);
   if(list.length === 0){ alert("Nenhum pedido no período."); return; }
 
@@ -437,7 +465,6 @@ function relatorioPeriodo(){
   a.download = `relatorio_${ini}_a_${fim}.txt`;
   a.click();
 }
-
 function exportarBackup(){
   const backup = {orders, clients, dayStatus, exportedAt: new Date().toISOString()};
   const blob = new Blob([JSON.stringify(backup,null,2)],{type:"application/json;charset=utf-8"});
@@ -446,10 +473,10 @@ function exportarBackup(){
   a.download = "backup_controle_delivery_rocha.json";
   a.click();
 }
-
 function importarBackup(event){
   const file = event.target.files && event.target.files[0];
   if(!file) return;
+
   const reader = new FileReader();
   reader.onload = () => {
     try{
@@ -497,7 +524,6 @@ function renderOrders(){
       </tr>`;
   });
 }
-
 function renderDashboard(){
   const list = ordersToday();
   let total = 0;
@@ -516,10 +542,9 @@ function renderDashboard(){
     <div class="kpi"><b>Em rota</b><div>${counts["Em rota"]}</div></div>
   `;
 
-  const st = document.getElementById("statusDia");
-  st.innerHTML = `Status do dia: Aguardando ${counts.Aguardando} • Separando ${counts.Separando} • Em rota ${counts["Em rota"]} • Entregue ${counts.Entregue} • Cancelado ${counts.Cancelado} • <b>${isClosed() ? "DIA FECHADO" : "DIA ABERTO"}</b>`;
+  document.getElementById("statusDia").innerHTML =
+    `Status do dia: Aguardando ${counts.Aguardando} • Separando ${counts.Separando} • Em rota ${counts["Em rota"]} • Entregue ${counts.Entregue} • Cancelado ${counts.Cancelado} • <b>${isClosed() ? "DIA FECHADO" : "DIA ABERTO"}</b>`;
 }
 </script>
-
 </body>
 </html>
