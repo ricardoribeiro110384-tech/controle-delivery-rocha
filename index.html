@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#111111">
 <link rel="manifest" href="manifest.json">
-<title>Delivery | Drogaria Rocha</title>
+<title>Controle de Delivery | Drogaria Rocha</title>
 <style>
 :root{
   --laranja:#ff6a00;
@@ -17,7 +17,7 @@
 }
 *{box-sizing:border-box}
 body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--cinza)}
-header{background:var(--preto);color:#fff;padding:14px 16px}
+header{background:var(--preto);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:10}
 header h3{margin:0;font-size:18px}
 header span{color:var(--laranja)}
 .container{padding:12px;max-width:1100px;margin:auto}
@@ -26,42 +26,59 @@ header span{color:var(--laranja)}
   box-shadow:0 2px 10px rgba(0,0,0,.08)
 }
 .card h3{margin:0 0 10px;border-left:4px solid var(--laranja);padding-left:10px}
-label{font-size:12px;font-weight:800;color:#555}
-input,select{
+label{font-size:12px;font-weight:900;color:#555}
+input,select,textarea{
   width:100%;padding:10px;margin:6px 0 10px;
-  border:1px solid var(--borda);border-radius:8px;font-size:14px
+  border:1px solid var(--borda);border-radius:10px;font-size:14px;
+  outline:none;
 }
+textarea{min-height:70px;resize:vertical}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media(max-width:640px){.row2{grid-template-columns:1fr}}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:760px){.row2,.row3{grid-template-columns:1fr}}
+
 button{
-  border:none;border-radius:8px;padding:10px 12px;font-weight:900;cursor:pointer
+  border:none;border-radius:10px;padding:10px 12px;font-weight:1000;cursor:pointer
 }
 .btn-main{background:var(--laranja);color:#fff;width:100%}
 .btn-dark{background:var(--preto);color:#fff}
 .btn-ok{background:var(--ok);color:#fff}
 .btn-danger{background:var(--danger);color:#fff}
-.btn-small{font-size:12px;margin:2px;padding:8px 10px}
+.btn-small{font-size:12px;margin:2px;padding:8px 10px;border-radius:10px}
 .table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:720px}
+table{width:100%;border-collapse:collapse;min-width:980px}
 th{background:var(--preto);color:#fff;padding:10px;font-size:12px;text-align:left}
 td{padding:10px;border-bottom:1px solid var(--borda);font-size:12px;vertical-align:top}
 td.actions{white-space:nowrap}
-.badge{padding:4px 8px;border-radius:999px;font-size:11px;font-weight:900}
+.badge{padding:4px 10px;border-radius:999px;font-size:11px;font-weight:1000;display:inline-block}
 .Aguardando{background:#eee}
+.Separando{background:#dbeafe;color:#1e3a8a}
 .Em\ rota{background:#ffe0c2;color:#b34700}
 .Entregue{background:#d4f7d4;color:#006400}
 .Cancelado{background:#ffd6d6;color:#8b0000}
-.notice{background:#fff7ed;border:1px solid #ffd7b8;color:#7a3a00;padding:10px;border-radius:10px;font-size:12px}
+.notice{background:#fff7ed;border:1px solid #ffd7b8;color:#7a3a00;padding:10px;border-radius:12px;font-size:12px}
 .muted{font-size:12px;color:#666}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:#111;color:#fff;border-radius:14px;padding:12px}
+.kpi b{display:block;font-size:12px;opacity:.9}
+.kpi div{font-size:18px;margin-top:6px}
+.kpi.orange{background:var(--laranja)}
 </style>
 </head>
 <body>
 
 <header>
-  <h3>Delivery — <span>Drogaria Rocha</span></h3>
+  <h3>Controle de Delivery — <span>Drogaria Rocha</span></h3>
 </header>
 
 <div class="container">
+
+  <div class="card">
+    <h3>Dashboard (Hoje)</h3>
+    <div class="kpis" id="kpis"></div>
+    <div class="muted" style="margin-top:8px" id="statusDia"></div>
+  </div>
 
   <div class="card">
     <h3>Cadastro de Clientes</h3>
@@ -77,9 +94,10 @@ td.actions{white-space:nowrap}
       </div>
     </div>
 
-    <div class="row2">
+    <div class="row3">
       <button class="btn-dark" onclick="salvarCliente()">Salvar / Atualizar</button>
       <button class="btn-danger" onclick="excluirCliente()">Excluir</button>
+      <button class="btn-dark" onclick="exportarClientes()">Backup clientes (.json)</button>
     </div>
 
     <div style="margin-top:10px">
@@ -90,30 +108,50 @@ td.actions{white-space:nowrap}
     </div>
 
     <div class="notice" style="margin-top:10px">
-      No Xiaomi, para abrir sempre no WhatsApp Business, defina o Business como padrão para links do WhatsApp nas configurações do sistema.
+      No computador, os botões abrem o <b>WhatsApp Web</b>. Certifique-se de estar logado.
     </div>
   </div>
 
   <div class="card">
     <h3>Novo Pedido</h3>
 
-    <label>Data</label>
-    <input type="date" id="dataPedido">
+    <div class="row2">
+      <div>
+        <label>Data</label>
+        <input type="date" id="dataPedido">
+      </div>
+      <div>
+        <label>Status inicial</label>
+        <select id="statusInicial">
+          <option>Aguardando</option>
+          <option>Separando</option>
+          <option>Em rota</option>
+        </select>
+      </div>
+    </div>
 
     <label>Cliente</label>
     <input id="cliente" placeholder="Nome do cliente">
 
     <label>Telefone (somente números)</label>
-    <input id="telefone" placeholder="89999999999" oninput="autoBuscarClientePorTelefone()">
+    <input id="telefone" placeholder="89999999999" inputmode="numeric" oninput="autoBuscarClientePorTelefone()">
 
     <label>Pedido</label>
-    <input id="pedido" placeholder="Ex.: Dipirona + Vitamina C">
+    <textarea id="pedido" placeholder="Ex.: Dipirona + Vitamina C"></textarea>
 
-    <label>Valor (R$)</label>
-    <input id="valor" placeholder="Ex.: 35,90">
+    <div class="row2">
+      <div>
+        <label>Valor (R$)</label>
+        <input id="valor" placeholder="Ex.: 35,90">
+      </div>
+      <div>
+        <label>Observação (opcional)</label>
+        <input id="obs" placeholder="Ex.: sem troco / entregar na portaria">
+      </div>
+    </div>
 
     <button class="btn-main" onclick="addPedido()">Adicionar Pedido</button>
-    <div class="muted" style="margin-top:8px">Dica: ao adicionar pedido com cliente + telefone, o cliente aparece no cadastro (se ainda não existir).</div>
+    <div class="muted" style="margin-top:8px">Ao adicionar, o cliente é salvo automaticamente se ainda não existir.</div>
   </div>
 
   <div class="card">
@@ -126,6 +164,7 @@ td.actions{white-space:nowrap}
             <th>Pedido</th>
             <th>Valor</th>
             <th>Status</th>
+            <th>WhatsApp</th>
             <th>Ações</th>
           </tr>
         </thead>
@@ -137,7 +176,7 @@ td.actions{white-space:nowrap}
   <div class="card">
     <div class="row2">
       <button class="btn-ok" onclick="abrirDia()">Abrir Dia</button>
-      <button class="btn-danger" onclick="fecharDia()">Fechar Dia</button>
+      <button class="btn-danger" onclick="fecharDia()">Fechar Dia (gera TXT)</button>
     </div>
     <div class="muted" style="margin-top:8px">Fechar dia arquiva os pedidos de hoje e baixa um TXT com o fechamento.</div>
   </div>
@@ -154,24 +193,34 @@ td.actions{white-space:nowrap}
         <input type="date" id="repFim">
       </div>
     </div>
-    <button class="btn-dark" onclick="relatorioPeriodo()">Baixar relatório por período</button>
+    <div class="row3">
+      <button class="btn-dark" onclick="relatorioPeriodo()">Baixar relatório (TXT)</button>
+      <button class="btn-dark" onclick="exportarBackup()">Backup completo (.json)</button>
+      <label class="btn-dark" style="display:inline-flex;align-items:center;justify-content:center;gap:8px">
+        Importar backup
+        <input id="importFile" type="file" accept="application/json" style="display:none" onchange="importarBackup(event)">
+      </label>
+    </div>
   </div>
 
 </div>
 
 <script>
+/* PWA */
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./service-worker.js");
 }
 
-const STORAGE_ORDERS = "rocha_orders_v3";
-const STORAGE_CLIENTS = "rocha_clients_v3";
-const STORAGE_DAY = "rocha_day_v3";
+/* STORAGE */
+const STORAGE_ORDERS = "rocha_orders_v5";
+const STORAGE_CLIENTS = "rocha_clients_v5";
+const STORAGE_DAY = "rocha_day_v5";
 
 let orders = JSON.parse(localStorage.getItem(STORAGE_ORDERS) || "[]");
 let clients = JSON.parse(localStorage.getItem(STORAGE_CLIENTS) || "[]");
 let dayStatus = JSON.parse(localStorage.getItem(STORAGE_DAY) || "{}");
 
+/* HELPERS */
 function hoje(){ return new Date().toISOString().split("T")[0]; }
 function digits(v){ return String(v||"").replace(/\D/g,""); }
 function parseMoney(s){
@@ -179,18 +228,14 @@ function parseMoney(s){
   return Number.isFinite(n) ? n : NaN;
 }
 function fmtMoney(n){ return (Number(n)||0).toFixed(2).replace(".",","); }
-
 function saveAll(){
   localStorage.setItem(STORAGE_ORDERS, JSON.stringify(orders));
   localStorage.setItem(STORAGE_CLIENTS, JSON.stringify(clients));
   localStorage.setItem(STORAGE_DAY, JSON.stringify(dayStatus));
 }
+function isClosed(){ return (dayStatus[hoje()] || "aberto") === "fechado"; }
 
-function isClosed(){
-  const d = hoje();
-  return (dayStatus[d] || "aberto") === "fechado";
-}
-
+/* INIT */
 (function init(){
   const d = hoje();
   dataPedido.value = d;
@@ -200,8 +245,10 @@ function isClosed(){
   saveAll();
   renderClients();
   renderOrders();
+  renderDashboard();
 })();
 
+/* CLIENTS */
 function renderClients(){
   const sel = document.getElementById("clientesSelect");
   sel.innerHTML = '<option value="">Selecione um cliente…</option>';
@@ -213,54 +260,38 @@ function renderClients(){
     sel.appendChild(opt);
   });
 }
-
 function salvarCliente(){
   const nome = (cNome.value || "").trim();
   const tel = digits(cTel.value);
-
-  if(!nome || !tel){
-    alert("Preencha Nome e Telefone.");
-    return;
-  }
+  if(!nome || !tel){ alert("Preencha Nome e Telefone."); return; }
   const idx = clients.findIndex(c => c.tel === tel);
   if(idx >= 0) clients[idx].nome = nome;
   else clients.push({nome, tel});
-
-  cNome.value = ""; cTel.value = "";
-  saveAll();
-  renderClients();
+  cNome.value=""; cTel.value="";
+  saveAll(); renderClients();
   alert("Cliente salvo!");
 }
-
 function excluirCliente(){
   const tel = digits(cTel.value) || (clientesSelect.value || "");
   if(!tel){ alert("Selecione um cliente ou informe o telefone."); return; }
-
   const c = clients.find(x => x.tel === tel);
   if(!c){ alert("Cliente não encontrado."); return; }
   if(!confirm(`Excluir ${c.nome} (${c.tel})?`)) return;
-
   clients = clients.filter(x => x.tel !== tel);
-  cNome.value = ""; cTel.value = "";
-  clientesSelect.value = "";
-  saveAll();
-  renderClients();
+  cNome.value=""; cTel.value=""; clientesSelect.value="";
+  saveAll(); renderClients();
   alert("Cliente excluído!");
 }
-
 function usarClienteSelecionado(){
   const tel = clientesSelect.value;
   if(!tel) return;
   const c = clients.find(x => x.tel === tel);
   if(!c) return;
-
   cliente.value = c.nome;
   telefone.value = c.tel;
-
   cNome.value = c.nome;
   cTel.value = c.tel;
 }
-
 function autoBuscarClientePorTelefone(){
   const tel = digits(telefone.value);
   telefone.value = tel;
@@ -268,17 +299,17 @@ function autoBuscarClientePorTelefone(){
   if(c) cliente.value = c.nome;
 }
 
+/* ORDERS */
 function addPedido(){
-  if(isClosed()){
-    alert("Dia fechado. Clique em 'Abrir Dia' para lançar pedidos.");
-    return;
-  }
+  if(isClosed()){ alert("Dia fechado. Clique em 'Abrir Dia' para lançar pedidos."); return; }
 
   const date = dataPedido.value || hoje();
   const nome = (cliente.value || "").trim();
   const tel = digits(telefone.value);
   const desc = (pedido.value || "").trim();
   const val = parseMoney(valor.value);
+  const obsTxt = (obs.value || "").trim();
+  const st = (statusInicial.value || "Aguardando");
 
   if(!nome || !tel || !desc || !Number.isFinite(val)){
     alert("Preencha Cliente, Telefone, Pedido e Valor corretamente.");
@@ -287,20 +318,21 @@ function addPedido(){
 
   if(!clients.some(c => c.tel === tel)){
     clients.push({nome, tel});
-    saveAll();
     renderClients();
   }
 
   orders.push({
     id: "id_" + Math.random().toString(16).slice(2) + "_" + Date.now(),
     date, nome, tel, desc, val,
-    status: "Aguardando",
+    obs: obsTxt,
+    status: st,
     archived: false
   });
 
-  pedido.value=""; valor.value="";
+  pedido.value=""; valor.value=""; obs.value="";
   saveAll();
   renderOrders();
+  renderDashboard();
 }
 
 function ordersToday(){
@@ -309,58 +341,64 @@ function ordersToday(){
 }
 
 function setStatus(i, status){
-  if(isClosed()){
-    alert("Dia fechado. Não é possível alterar.");
-    return;
-  }
+  if(isClosed()){ alert("Dia fechado. Não é possível alterar."); return; }
   const list = ordersToday();
   const target = list[i];
   if(!target) return;
-
   orders = orders.map(o => o.id === target.id ? {...o, status} : o);
-  saveAll();
-  renderOrders();
+  saveAll(); renderOrders(); renderDashboard();
 }
 
 function excluirPedido(i){
-  if(isClosed()){
-    alert("Dia fechado. Não é possível excluir.");
-    return;
-  }
+  if(isClosed()){ alert("Dia fechado. Não é possível excluir."); return; }
   const list = ordersToday();
   const target = list[i];
   if(!target) return;
-
   if(!confirm("Excluir este pedido definitivamente?")) return;
   orders = orders.filter(o => o.id !== target.id);
-  saveAll();
-  renderOrders();
+  saveAll(); renderOrders(); renderDashboard();
 }
 
+/* WHATSAPP (PC -> Web WhatsApp) */
+function abrirWhatsApp(i, tipo){
+  const list = ordersToday();
+  const o = list[i];
+  if(!o) return;
+
+  const tel = digits(o.tel);
+  if(!tel){ alert("Telefone inválido."); return; }
+
+  const msg = (tipo === "status")
+    ? `Olá ${o.nome}! Seu pedido está: ${o.status}. Drogaria Rocha.`
+    : `Olá ${o.nome}! Obrigado pela preferência 😊 Drogaria Rocha.`;
+
+  // Se o tel já tiver DDD (ex: 89...), isso funciona.
+  // Acrescenta 55 (Brasil). Se você já salvar com 55, tire esse "55".
+  const url = `https://web.whatsapp.com/send?phone=55${tel}&text=${encodeURIComponent(msg)}`;
+  window.open(url, "_blank");
+}
+
+/* DAY OPEN/CLOSE + TXT */
 function abrirDia(){
   dayStatus[hoje()] = "aberto";
   saveAll();
+  renderDashboard();
   alert("Dia aberto.");
 }
 
 function fecharDia(){
-  if(isClosed()){
-    alert("O dia já está fechado.");
-    return;
-  }
+  if(isClosed()){ alert("O dia já está fechado."); return; }
   const list = ordersToday();
-  if(list.length === 0){
-    alert("Nenhum pedido hoje.");
-    return;
-  }
+  if(list.length === 0){ alert("Nenhum pedido hoje."); return; }
   const d = hoje();
+
   orders = orders.map(o => (o.date === d && !o.archived) ? {...o, archived:true} : o);
 
   let total = 0;
   let txt = `FECHAMENTO DO DIA - DROGARIA ROCHA\nData: ${d}\n\n`;
   list.forEach(o=>{
     total += o.val;
-    txt += `${o.nome} | ${o.desc} | R$ ${fmtMoney(o.val)} | ${o.status}\n`;
+    txt += `${o.nome} | ${o.desc} | R$ ${fmtMoney(o.val)} | ${o.status}${o.obs ? " | Obs: "+o.obs : ""}\n`;
   });
   txt += `\nTOTAL: R$ ${fmtMoney(total)}\n`;
 
@@ -373,26 +411,23 @@ function fecharDia(){
   dayStatus[d] = "fechado";
   saveAll();
   renderOrders();
-  alert("Dia fechado e fechamento baixado.");
+  renderDashboard();
+  alert("Dia fechado e TXT baixado.");
 }
 
+/* REPORTS / BACKUP */
 function relatorioPeriodo(){
   const ini = repIni.value;
   const fim = repFim.value;
-  if(!ini || !fim || ini > fim){
-    alert("Período inválido.");
-    return;
-  }
+  if(!ini || !fim || ini > fim){ alert("Período inválido."); return; }
   const list = orders.filter(o => o.date >= ini && o.date <= fim);
-  if(list.length === 0){
-    alert("Nenhum pedido no período.");
-    return;
-  }
+  if(list.length === 0){ alert("Nenhum pedido no período."); return; }
+
   let total = 0;
   let txt = `RELATÓRIO - DROGARIA ROCHA\nPeríodo: ${ini} a ${fim}\n\n`;
   list.forEach(o=>{
     total += o.val;
-    txt += `${o.date} | ${o.nome} | ${o.desc} | R$ ${fmtMoney(o.val)} | ${o.status} | ${o.archived ? "FECHADO" : "ABERTO"}\n`;
+    txt += `${o.date} | ${o.nome} | ${o.desc} | R$ ${fmtMoney(o.val)} | ${o.status} | ${o.archived ? "FECHADO" : "ABERTO"}${o.obs ? " | Obs: "+o.obs : ""}\n`;
   });
   txt += `\nTOTAL: R$ ${fmtMoney(total)}\n`;
 
@@ -403,19 +438,57 @@ function relatorioPeriodo(){
   a.click();
 }
 
+function exportarBackup(){
+  const backup = {orders, clients, dayStatus, exportedAt: new Date().toISOString()};
+  const blob = new Blob([JSON.stringify(backup,null,2)],{type:"application/json;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "backup_controle_delivery_rocha.json";
+  a.click();
+}
+
+function importarBackup(event){
+  const file = event.target.files && event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const data = JSON.parse(reader.result);
+      if(data.orders) orders = data.orders;
+      if(data.clients) clients = data.clients;
+      if(data.dayStatus) dayStatus = data.dayStatus;
+      saveAll();
+      renderClients(); renderOrders(); renderDashboard();
+      alert("Backup importado!");
+    }catch(e){
+      alert("Arquivo inválido.");
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = "";
+}
+
+/* RENDER */
 function renderOrders(){
   const list = ordersToday();
   const tbody = document.getElementById("lista");
   tbody.innerHTML = "";
 
   list.forEach((o,i)=>{
+    const obsFmt = o.obs ? `<div class="muted">Obs: ${o.obs}</div>` : "";
     tbody.innerHTML += `
       <tr>
         <td><b>${o.nome}</b><div class="muted">${o.tel}</div></td>
-        <td>${o.desc}</td>
+        <td>${o.desc}${obsFmt}</td>
         <td>R$ ${fmtMoney(o.val)}</td>
         <td><span class="badge ${o.status}">${o.status}</span></td>
         <td class="actions">
+          <button class="btn-small btn-dark" onclick="abrirWhatsApp(${i},'status')">Whats (Status)</button>
+          <button class="btn-small btn-dark" onclick="abrirWhatsApp(${i},'obrigado')">Whats (Obrigado)</button>
+        </td>
+        <td class="actions">
+          <button class="btn-small btn-dark" onclick="setStatus(${i},'Aguardando')">Aguard.</button>
+          <button class="btn-small btn-dark" onclick="setStatus(${i},'Separando')">Separ.</button>
           <button class="btn-small btn-dark" onclick="setStatus(${i},'Em rota')">Rota</button>
           <button class="btn-small btn-dark" onclick="setStatus(${i},'Entregue')">Entregue</button>
           <button class="btn-small btn-dark" onclick="setStatus(${i},'Cancelado')">Cancelar</button>
@@ -423,6 +496,28 @@ function renderOrders(){
         </td>
       </tr>`;
   });
+}
+
+function renderDashboard(){
+  const list = ordersToday();
+  let total = 0;
+  const counts = {Aguardando:0, Separando:0, "Em rota":0, Entregue:0, Cancelado:0};
+  list.forEach(o=>{
+    total += Number(o.val||0);
+    if(counts[o.status] !== undefined) counts[o.status] += 1;
+  });
+  const ticket = list.length ? (total / list.length) : 0;
+
+  const kpis = document.getElementById("kpis");
+  kpis.innerHTML = `
+    <div class="kpi orange"><b>Pedidos hoje</b><div>${list.length}</div></div>
+    <div class="kpi"><b>Total hoje</b><div>R$ ${fmtMoney(total)}</div></div>
+    <div class="kpi"><b>Ticket médio</b><div>R$ ${fmtMoney(ticket)}</div></div>
+    <div class="kpi"><b>Em rota</b><div>${counts["Em rota"]}</div></div>
+  `;
+
+  const st = document.getElementById("statusDia");
+  st.innerHTML = `Status do dia: Aguardando ${counts.Aguardando} • Separando ${counts.Separando} • Em rota ${counts["Em rota"]} • Entregue ${counts.Entregue} • Cancelado ${counts.Cancelado} • <b>${isClosed() ? "DIA FECHADO" : "DIA ABERTO"}</b>`;
 }
 </script>
 
